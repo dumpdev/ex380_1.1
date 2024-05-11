@@ -1,0 +1,208 @@
+Initial Setting: 
+  103  #ssh ocpadm@workbench
+  104  #password: 
+  105  #cat /usr/locat/etc/ocp4.config
+  106  #oc login -u kubeadmin -p <passwd-above-file> https://api.ocp4.example.com:6443 --[in exam]
+  107  oc login -u admin -p redhatocp https://api.ocp4.example.com:6443 
+  108  oc get nodes
+  109  oc whoami --show-console 
+Q#01
+    2  lab start auth-ldap
+    3  git clone https://github.com/dumpdev/ex380_1.1.git
+    5  #oc create secret generic ldap-secret --from-literal=bindPassword=<secret> -n openshift-config
+    6  oc create secret generic rhds-secret --from-literal=bindPassword=redhatocp -n openshift-config
+    7  wget http://idm.ocp4.example.com/ipa/config/ca.crt
+    9  #oc create configmap ca-config-map --from-file=ca.crt=/path/to/ca -n openshift-config
+   10  oc create configmap rhds-ca-cm --from-file=ca.crt=/home/student/ca.crt -n openshift-config
+   11  oc get identity
+   12  oc whoami
+   15  cd /home/student/ex380_1.1/ldap
+   17  vim oauth-cluster.yaml
+   18  oc get oauth
+   19  oc get oauth cluster -o yaml
+   20  oc apply -f oauth-cluster.yaml 
+  110  watch oc get pods -n openshift-authentication
+   21  oc get oauth cluster -o yaml
+   22  oc logout
+   23  oc login -u kristendelgado -p redhat123
+   24  oc whoami
+   25  #curl -sk --header "Authorization: Bearer $TOKEN" -X GET https://api.ocp4.example.com:6443/api/v1/pods/ | jq ".items[].metadata.name"
+   26  oc whoami -t
+   27  TOKEN=sha256~6PBGAtMX0ztr0_9SNx0kocx-syFi6dtCzXbzYAQzeoY
+   28  curl -sk --header "Authorization: Bearer $TOKEN" -X GET https://api.ocp4.example.com:6443/api/v1/pods/ | jq ".items[].metadata.name"
+   29  oc logout
+   30  #oc login -u kubeadmin -p <from-file> [in exam]
+   31  #oc login -u admin -p redhatocp
+   32  oc login -u admin -p redhatocp
+   33  oc adm policy add-cluster-role-to-user cluster-admin kristendelgado
+   34  oc logout
+   35  oc login -u kristendelgado -p redhat123
+   36  oc whoami -t
+   37  TOKEN=sha256~uajWUOBZHrSMILHRP2mxHa4U0HmzB0O5EsVWxPQZ5sA
+   38  curl -sk --header "Authorization: Bearer $TOKEN" -X GET https://api.ocp4.example.com:6443/api/v1/pods/ | jq ".items[].metadata.name"
+   41  cat oauth-cluster.yaml 
+   42  oc get oauth cluster -o yaml
+--------------------------
+Q#02
+   44  cd /home/student/ex380_1.1/ansible
+   45  tree .
+   46  cat 2048-gameinit.yaml
+   47  vim 2048-gameinit.yaml
+   48  #Project --> SA --> RBAC --> Deploy APP --> Service --> Route --> Test
+   49  cat 2048-gameinit.yaml 
+   50  #Project --> SA --> RBAC --> Deploy APP --> Service --> Route --> Test
+   51  tree .
+   52  cat 2048-deploy.yaml
+   53  tree .
+   54  cat 2048-svc.yaml
+   55  ansible-playbook 2048-gameinit.yaml --syntax-check
+   56  vim 2048-gameinit.yaml 
+   57  ansible-playbook 2048-gameinit.yaml --syntax-check
+   58  vim 2048-gameinit.yaml 
+   59  ansible-playbook 2048-gameinit.yaml --syntax-check
+   60  #Project --> SA --> RBAC --> Deploy APP --> Service --> Route --> Test
+   61  vim 2048-gameinit.yaml 
+   62  ls
+   63  cat 2048-serviceaccount.yaml
+   64  vim 2048-serviceaccount.yaml
+   65  vim 2048-gameinit.yaml 
+   66  cat 2048-rbac.yaml 
+   67  cp ../ans-files/2048-gameinit.yaml .
+   68  vim 2048-gameinit.yaml 
+   69  ansible-playbook 2048-gameinit.yaml --syntax-check
+   70  cat 2048-gameinit.yaml 
+   71  oc get project opengame
+   72  oc get all -n opengame
+   73  cat 2048-gameinit.yaml 
+   74  ##http://game-opengame.apps.ocp4.example.com
+   75  ansible-playbook 2048-gameinit.yaml 
+   76  python --version
+   77  cat hosts_update 
+   78  sudo vim /etc/ansible/hosts 
+   91  pip3 install pyyaml 
+   92  pip3 install openshift
+   75  ansible-playbook 2048-gameinit.yaml 
+   95  oc get project opengame
+   96  oc get all -n opengame
+   97  #http://game-opengame.apps.ocp4.example
+-------------------------------------------------------
+Q#03
+  102  lab start monitoring-alerts
+  111  oc get pods alertmanager-main-0 alertmanager-main-1 -n openshift-monitoring 
+  112  oc get secrets alertmanager-main -n openshift-monitoring
+  113  cd /home/student/ex380_1.1/alerts
+  114  ls
+  115  vim alertmanager.yaml 
+  208  oc set data secret/alertmanager-main --from-file alertmanager.yaml -n openshift-monitoring
+  125  ##Testing Email Reception 
+  126  ssh lab@utility.lab.example.com mail
+------------------------------------------------------
+Q#04
+  210  cd /home/student/ex380_1.1/kubemigrate
+  211  ls
+  212  cat land-migrate.yaml
+  213  ls
+  214  ./land.sh 
+  215  cat land-migrate.yaml
+  216  ls
+  217  podman load -i landing.tar
+  219  podman images
+  220  podman tag 2e3b9ea40484 registry.ocp4.example.com:8443/developer/redhat-landing:latest
+  221  podman images
+  222  podman login -u developer -p developer registry.ocp4.example.com:8443
+  223  podman push registry.ocp4.example.com:8443/developer/redhat-landing:latest
+  225  vim land-migrate.yaml 
+  226  oc create -f land-migrate.yaml 
+  227  oc project landing 
+  228  oc get all
+  229  #http://landing.apps.ocp4.example.com
+  230  oc get is
+  233  oc describe deployment landing | grep -i -A2 -E 'Annotations|Containers'
+  234  oc import-image registry.ocp4.example.com:8443/developer/redhat-landing:latest --confirm --scheduled 
+  235  oc get is
+  236  oc describe deployment landing | grep -i -A2 -E 'Annotations|Containers'
+  238  oc set triggers deployment/landing --from-image redhat-landing:latest -c redhat-landing 
+  239  oc describe deployment landing | grep -i -A2 -E 'Annotations|Containers'
+---------------------------------------------------------------
+Q#05
+  127  cat /etc/crontab 
+  242  oc new-project maxim
+  243  oc create cronjob scaling --image=quay.io/redhattraining/scaling --schedule='5 4 2 * *'
+  244  oc get cronjob
+  245  oc get sa magnum
+  246  oc create serviceaccount magnum
+  247  oc edit cronjob scaling 
+  248  oc get cronjobs
+  249  oc describe cronjobs scaling 
+--------------------------------
+Q#06
+  251  cd /home/student/ex380_1.1/machine
+  252  ls
+  253  cat chrony.conf
+  254  oc get mc
+  256  oc get mc 99-worker-chrony-conf-override
+  257  oc get mc 99-worker-chrony-conf-override -o yaml > chrony-mc.yaml
+  258  vim chrony-mc.yaml 
+  259  cat chrony-mc.yaml 
+  260  cat chrony.conf 
+  261  base64 -w0 chrony.conf 
+  262  vim chrony-mc.yaml 
+  263  cat chrony-mc.yaml 
+  277  oc get nodes
+  278  watch oc get nodes
+  128  ssh core@worker01.ocp4.example.com cat /etc/chrony.conf
+  129  ssh core@worker02.ocp4.example.com cat /etc/chrony.conf
+  130  ssh core@worker03.ocp4.example.com cat /etc/chrony.conf
+-------------------------------------------
+Q#07
+  132  oc whoami --show-console
+****operator installation done in console***********
+----------------------------------
+Q#08
+  133  oc new-project galaxy
+  134  oc new-app --name=lamda --image=quay.io/redhattraining/hello-world-nginx
+  135  oc get pods
+  136  oc get deployment
+  137  oc scale --replicas=2 deployment/lamda
+  138  oc get pods
+  139  oc get service
+  140  oc create route edge --service=lamda --hostname=lamda.apps.ocp4.example.com
+  141  oc get route
+  142  #https://lamda.apps.ocp4.example.com
+  144  oc get pods
+  145  oc rsh lamda-7bd67487b-g9pgw
+  146  cat > pv.yaml
+  147  vim pv.yaml 
+  118  oc get sc
+  119  oc get sc nfs-storage -o yaml
+  120  oc get sc nfs-storage 
+  148  oc create -f pv.yaml 
+  149  oc get pv lamda-pv 
+  150  oc get deployment
+  151  #mount-path: /srv
+  152  oc set volumes --type=pvc --claim-name=lamdapvc --claim-size=2Gi --claim-mode=ReadWriteMany --add --mount-path=/srv deployment/lamda
+  153  oc get pvc
+  154  oc get pv lamda-pv 
+  155  oc get pods
+  156  oc rsh lamda-c45dcdcc7-4txsj 
+------------------------------------------
+  158  ssh core@worker01.ocp4.example.com sudo systemctl stop kubelet
+  159  ssh core@worker01.ocp4.example.com 'sudo systemctl stop kubelet'
+  160  cd ~/ex380/schedule
+  161  ls
+  162  oc create -f genapp.yaml
+  163  oc project catalog 
+  164  oc get pods
+  165  oc get pods -o wide
+  166  oc describe pod redis-57b5d444cb-mt6kn | grep -A5 Events
+  167  oc describe pod redis-57b5d444cb-mt6kn | grep Node-Selector
+  168  oc get pods
+  169  oc get node worker01 --show-labels 
+  170  oc label node worker01 base=alpha
+  171  oc get pods -o wide
+  172  oc get deployment
+  173  #oc edit deployment redis 
+  174  oc describe deployment redis 
+  175  oc get pods -o wide
+-------------------------------
+
