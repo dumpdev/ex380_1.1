@@ -192,6 +192,14 @@ Q#09
   160  cd ~/ex380/schedule
   161  ls
   162  oc create -f genapp.yaml
+       ssh core@worker01.ocp4.example.com
+       sudo -i
+       systemctl start kubelet
+       systemctl is-enabled kubelet
+       systemctl is-enabled crio
+       systemctl enable crio
+       exit
+       exit
   163  oc project catalog 
   164  oc get pods
   165  oc get pods -o wide
