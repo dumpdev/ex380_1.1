@@ -186,6 +186,7 @@ Q#08
   155  oc get pods
   156  oc rsh lamda-c45dcdcc7-4txsj 
 ------------------------------------------
+Q#09
   158  ssh core@worker01.ocp4.example.com sudo systemctl stop kubelet
   159  ssh core@worker01.ocp4.example.com 'sudo systemctl stop kubelet'
   160  cd ~/ex380/schedule
@@ -205,4 +206,14 @@ Q#08
   174  oc describe deployment redis 
   175  oc get pods -o wide
 -------------------------------
-
+Q#10
+       cd logging/
+  288  ls
+  289  oc create -f elasticsearch-operator.yml 
+  294  oc create -f logging-operator.yml 
+  304  vim event-router-template.yml 
+  305  oc create -f event-router-template.yml -n openshift-logging 
+  307  oc new-app --template=eventrouter-template -n openshift-logging
+  308  vim cl-minimal.yml 
+  309  oc create -f cl-minimal.yml 
+  
